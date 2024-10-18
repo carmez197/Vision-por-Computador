@@ -1,0 +1,31 @@
+#creamos un procedimiento para mostrar las imagenes
+def show_images(GRID=[4,4], model=None, size=(20,20), data=train_ds):
+    n_rows = GRID[0]
+    n_cols = GRID[1]
+    n_images = n_cols * n_rows
+    
+    i = 1
+    plt.figure(figsize=size)
+    for images, labels in data:
+        id = np.random.randint(len(images))
+        image, label = images[id], class_names[int(labels[id])]
+        
+        plt.subplot(n_rows, n_cols, i)
+        plt.imshow(image)
+        
+        if model is None:
+            title = f"Class : {label}"
+        else:
+            pred = class_names[int(np.argmax(model.predict(image[np.newaxis, ...])))]
+            title = f"Org : {label}, Pred : {pred}"
+        
+        plt.title(title)
+        plt.axis('off')
+        
+        i+=1
+        if i>=(n_images+1):
+            break
+        cls()
+            
+    plt.tight_layout()
+    plt.show()
