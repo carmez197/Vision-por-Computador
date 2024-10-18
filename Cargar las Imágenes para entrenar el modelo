@@ -1,0 +1,49 @@
+# aqui agregamos la ruta de donde vamos a leer las imagenes
+root_path = '/Users/carlosmeza/Documents/Uninorte/Vision por Computador/Dataset/Front/'
+
+# miramos las clases de billetes que vamos a cargar, ignorando archivos ocultos como .DS_Store
+class_names = sorted([name for name in os.listdir(root_path) if not name.startswith('.') and os.path.isdir(os.path.join(root_path, name))])
+
+# Verificar número de clases
+n_classes = len(class_names)
+print(f"Total number of classes : {n_classes}")
+
+# Calculate class distribution, filtrando archivos que no sean imágenes
+class_dis = [len([f for f in os.listdir(os.path.join(root_path, name)) if not f.startswith('.')]) for name in class_names]
+
+# Visualise class distribution (gráfico de pastel)
+fig = px.pie(names=class_names, values=class_dis, title="Class Distribution", hole=0.4)
+fig.update_layout({'title':{'x':0.5}})
+fig.show()
+
+# Bar Plot (gráfico de barras)
+fig = px.bar(x=class_names, y=class_dis, color=class_names)
+fig.show()
+
+
+# Calculate class distribution
+class_dis = [len(os.listdir(root_path + name)) for name in class_names]
+
+# Visualise class distribution
+fig = px.pie(names=class_names, values=class_dis, title="Class Distribution", hole=0.4)
+fig.update_layout({'title':{'x':0.5}})
+fig.show()
+
+# Bar Plot
+fig = px.bar(x=class_names, y=class_dis, color=class_names)
+fig.show()
+
+#utilizamos la libreria ImageDataGenerator para leer las imageness
+#hacemos una rotacion de 10 porciento en caso que las imagenes de los billetes no queden horizontales y los pueda identificar
+# Initialise generator
+train_gen = ImageDataGenerator(rescale=1./255, horizontal_flip=False, rotation_range=10, validation_split=0.3)
+
+# Load data
+#dividimos los datos para entrenamiento y validaacion con un 70 - 30
+train_ds = train_gen.flow_from_directory(root_path, class_mode='binary' ,shuffle=True, batch_size=10, subset='training')
+valid_ds = train_gen.flow_from_directory(root_path, class_mode='binary' ,shuffle=True, batch_size=10, subset='validation')
+
+
+# Load data
+train_ds = train_gen.flow_from_directory(root_path, class_mode='binary' ,shuffle=True, batch_size=32, subset='training')
+valid_ds = train_gen.flow_from_directory(root_path, class_mode='binary' ,shuffle=True, batch_size=32, subset='validation')
