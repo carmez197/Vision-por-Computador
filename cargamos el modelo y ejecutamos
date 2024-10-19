@@ -1,0 +1,58 @@
+# Load Model
+model_path = "/Users/carlosmeza/Documents/Uninorte/Vision por Computador/Dataset/Front/ResNet50V2-Colombia-billetes.keras"
+model = load_model(model_path)
+
+# informacion del modelo
+model.summary()
+
+#mostramos las imagenes que teniamos para validar el modelo  
+show_images(model=model, data=valid_ds)
+
+
+# ruta donde esta la imagen para validar el modelo
+root_patht = '/Users/carlosmeza/Documents/Uninorte/Vision por Computador/Dataset/Data/'
+
+#cargamos la imagen con el ImageDataGenerator
+# Initialise generator
+train_gent = ImageDataGenerator(rescale=1./255, horizontal_flip=False, rotation_range=0, validation_split=0.5)
+
+# Load data
+train_dst = train_gent.flow_from_directory(root_patht, class_mode='binary' ,shuffle=True, batch_size=10, subset='training')
+valid_dst = train_gent.flow_from_directory(root_patht, class_mode='binary' ,shuffle=True, batch_size=10, subset='validation')
+
+#creamos un procedimiento para mostrar una sola imagen para validar
+def show_images1(GRID=[1,1], model=None, size=(20,20), data=train_dst):
+    n_rows = GRID[0]
+    n_cols = GRID[1]
+    n_images = n_cols * n_rows
+    
+    i = 1
+    plt.figure(figsize=size)
+    for images, labels in data:
+        id = np.random.randint(len(images))
+        image, label = images[id], class_names[int(labels[id])]
+        
+        plt.subplot(n_rows, n_cols, i)
+        plt.imshow(image)
+        
+        if model is None:
+            title = f"Class : {label}"
+        else:
+            pred = class_names[int(np.argmax(model.predict(image[np.newaxis, ...])))]
+            title = f"Org : {label}, Pred : {pred}"
+            print(f"Org : {label}, Pred : {pred}")
+        
+        plt.title(title)
+        plt.axis('off')
+        
+        i+=1
+        if i>=(n_images+1):
+            break
+        cls()
+            
+    plt.tight_layout()
+    plt.show()
+
+#mostramos los resultados
+show_images1(model=model, data=train_dst)
+show_images1(model=model, data=valid_dst)
